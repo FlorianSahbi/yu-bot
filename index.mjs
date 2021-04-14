@@ -4,6 +4,9 @@ import playlist from "./playlist_test.mjs";
 import ytdl from "ytdl-core-discord";
 import { request, gql } from 'graphql-request';
 
+global._prodEnv = "https://yu-server.herokuapp.com/";
+global._devEnv = "http://localhost:4000/";
+
 const query = gql`
   query {
     playlists {
@@ -19,6 +22,26 @@ const query = gql`
     }
   }
 `
+
+const queryTags = gql`
+  query {
+    tags {
+      _id
+      name
+    }
+  }
+`
+
+const GET_SONGS = gql`
+  query Songs($tag: ID) {
+    songs(tag: $tag) {
+      _id
+      title
+      cover
+      url
+    }
+  }
+`;
 
 global._aReact = [
   "1️⃣",
@@ -121,15 +144,15 @@ const playMusic = async (message) => {
   const connection = await joinVoiceChannel(message);
 
   const dispatcher = connection
-    .play(await ytdl(_activePlaylist.songs[0].url, { filter: _ => ["251"], highWaterMark: 1 << 25 }), { type: 'opus' })
+    .play(await ytdl(_activePlaylist[0].url, { filter: _ => ["251"], highWaterMark: 1 << 25 }), { type: 'opus' })
     .on("finish", () => {
-      _activePlaylist.songs.shift();
+      _activePlaylist.shift();
       message.channel.send(`---------  No responses  ---------`);
       playMusic(message);
     })
     .on("error", error => console.error(error));
   dispatcher.setVolumeLogarithmic(5 / 5);
-  message.channel.send(`Start playing: **${_activePlaylist.songs[0].title}**`);
+  message.channel.send(`Start playing: **${_activePlaylist[0].title}**`);
 }
 
 const skipMusic = (message) => {
@@ -222,10 +245,16 @@ client.on("message", async message => {
     return;
   }
 
-  else if (message.content.startsWith(`${config.prefix}dbPlaylists`)) {
-    const data = await request('https://yu-server.herokuapp.com', query)
+  else if (message.content.startsWith(`${config.prefix}info`)) {
+    console.log(_activePlaylist)
+    return;
+  }
 
-    const f = data.playlists.map((p, i) => ({ name: `Press ${getUnicode(i + 1)} to get :`, value: `${p.name} - ${p.songs.length} songs` }))
+  else if (message.content.startsWith(`${config.prefix}tags`)) {
+    // const data = await request('https://yu-server.herokuapp.com', queryTags)
+    const data = await request(_prodEnv, queryTags)
+  
+    const f = data.tags.map((p, i) => ({ name: `Press ${getUnicode(i + 1)} to get :`, value: `${p.name}` }))
     const m = await message.channel.send({
       embed: {
         color: "#ec4999",
@@ -250,9 +279,9 @@ client.on("message", async message => {
     m.awaitReactions(filter, { max: 1, time: 30000, errors: ['time'] })
       .then(collected => {
         const reaction = collected.first();
-        message.reply(`${data.playlists[getIndex(reaction.emoji.name) - 1].name} selected.`)
-        _activePlaylist = data.playlists[getIndex(reaction.emoji.name) - 1];
-        console.log(data.playlists[getIndex(reaction.emoji.name) - 1])
+        message.reply(`${data.tags[getIndex(reaction.emoji.name) - 1].name} selected.`)
+        _activePlaylist = data.tags[getIndex(reaction.emoji.name) - 1];
+        request(_prodEnv, GET_SONGS, {tag: data.tags[getIndex(reaction.emoji.name) - 1]._id}).then((data) => _activePlaylist = data.songs)
       })
       .catch(collected => {
         message.reply("Aborted.");
@@ -262,7 +291,6 @@ client.on("message", async message => {
 
     return;
   }
-
 
   else if (message.content.startsWith(`${config.prefix}guess`)) {
     guessMusic(message);
