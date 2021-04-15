@@ -7,30 +7,23 @@ import { request, gql } from 'graphql-request';
 global._prodEnv = "https://yu-server.herokuapp.com/";
 global._devEnv = "http://localhost:4000/";
 
-const query = gql`
-  query {
-    playlists {
-      _id
-      name
-      thumbnail
-      songs {
+const GET_TAGS = gql`
+  query Tags($limit: Int, $page: Int) {
+    tags(limit: $limit, page: $page) {
+      pagingCounter
+      totalDocs
+      limit
+      totalPages
+      page
+      hasPrevPage
+      hasNextPage
+      docs {
         _id
-        title
-        url
-        cover
+        name
       }
     }
   }
-`
-
-const queryTags = gql`
-  query {
-    tags {
-      _id
-      name
-    }
-  }
-`
+`;
 
 const GET_SONGS = gql`
   query Songs($tag: ID) {
@@ -52,7 +45,9 @@ global._aReact = [
   "6️⃣",
   "7️⃣",
   "8️⃣",
-  "9️⃣"
+  "9️⃣",
+  "➡️",
+  "⬅️",
 ]
 
 function getUnicode(i) {
@@ -191,6 +186,56 @@ const guessMusic = async (message) => {
   }
 }
 
+const manageTags = async (message, limit, page) => {
+  const data = await request(_devEnv, GET_TAGS, { limit, page })
+
+  const f = data.tags.docs.map((p, i) => ({ name: `Press ${getUnicode(i + 1)} to get :`, value: `${p.name}` }))
+  const m = await message.channel.send({
+    embed: {
+      color: "#ec4999",
+      title: `Tags - Page ${page}/${data.tags.totalPages}`,
+      url: "https://yu-client.vercel.app/tags",
+      description: "bla bla bla description, how to use it",
+      fields: f,
+      timestamp: new Date(),
+    }
+  })
+
+  if (data.tags.hasPrevPage) {
+    m.react("⬅️")
+  }
+  f.forEach((e, i) => {
+    m.react(getUnicode(i + 1))
+  });
+  if (data.tags.hasNextPage) {
+    m.react("➡️")
+  }
+
+  const filter = (reaction, user) => {
+    return _aReact.includes(reaction.emoji.name) && user.id === message.author.id;
+  };
+
+
+  m.awaitReactions(filter, { max: 1, time: 30000, errors: ['time'] })
+    .then((collected) => {
+      const reaction = collected.first();
+      console.log(reaction.emoji.name)
+
+      if (reaction.emoji.name === "➡️") {
+        message.reply("Next")
+        manageTags(message, 5, page + 1)
+      } else if (reaction.emoji.name === "⬅️") {
+        message.reply("Back")
+        manageTags(message, 5, page - 1)
+      } else {
+        message.reply(`${data.tags.docs[getIndex(reaction.emoji.name) - 1].name} selected.`)
+        _activePlaylist = data.tags.docs[getIndex(reaction.emoji.name) - 1];
+        request(_prodEnv, GET_SONGS, { tag: data.tags.docs[getIndex(reaction.emoji.name) - 1]._id }).then((data) => _activePlaylist = data.songs)
+      }
+
+    })
+}
+
 const client = new Client();
 
 
@@ -251,44 +296,7 @@ client.on("message", async message => {
   }
 
   else if (message.content.startsWith(`${config.prefix}tags`)) {
-    // const data = await request('https://yu-server.herokuapp.com', queryTags)
-    const data = await request(_prodEnv, queryTags)
-  
-    const f = data.tags.map((p, i) => ({ name: `Press ${getUnicode(i + 1)} to get :`, value: `${p.name}` }))
-    const m = await message.channel.send({
-      embed: {
-        color: "#ec4999",
-        title: "Playlists",
-        url: "https://yu-client.vercel.app/playlists",
-        description: "bla bla bla description, how to use it",
-        fields: f,
-        timestamp: new Date(),
-      }
-    })
-
-    f.forEach((e, i) => {
-      m.react(getUnicode(i + 1))
-    });
-
-
-
-    const filter = (reaction, user) => {
-      return _aReact.includes(reaction.emoji.name) && user.id === message.author.id;
-    };
-
-    m.awaitReactions(filter, { max: 1, time: 30000, errors: ['time'] })
-      .then(collected => {
-        const reaction = collected.first();
-        message.reply(`${data.tags[getIndex(reaction.emoji.name) - 1].name} selected.`)
-        _activePlaylist = data.tags[getIndex(reaction.emoji.name) - 1];
-        request(_prodEnv, GET_SONGS, {tag: data.tags[getIndex(reaction.emoji.name) - 1]._id}).then((data) => _activePlaylist = data.songs)
-      })
-      .catch(collected => {
-        message.reply("Aborted.");
-      });
-
-
-
+    manageTags(message, 5, 1);
     return;
   }
 
