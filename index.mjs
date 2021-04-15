@@ -187,7 +187,7 @@ const guessMusic = async (message) => {
 }
 
 const manageTags = async (message, limit, page) => {
-  const data = await request(_devEnv, GET_TAGS, { limit, page })
+  const data = await request(_prodEnv, GET_TAGS, { limit, page })
 
   const f = data.tags.docs.map((p, i) => ({ name: `Press ${getUnicode(i + 1)} to get :`, value: `${p.name}` }))
   const m = await message.channel.send({
