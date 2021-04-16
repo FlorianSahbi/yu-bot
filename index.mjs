@@ -71,7 +71,7 @@ const playMusic = async (message) => {
     console.log(_activePlaylist[0])
     if (_activePlaylist[0].correctWords.includes(m.content)) {
       // m.delete()
-      message.channel.send(`✅ Got it with ${message.content}`);
+      message.channel.send(`✅ Got it with ${m.content}`);
       message.channel.send(`The song was ${_activePlaylist[0].title}`)
       message.channel.send(_activePlaylist[0].url)
     } else {
