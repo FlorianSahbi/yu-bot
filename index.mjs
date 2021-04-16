@@ -168,7 +168,12 @@ client.on("message", async message => {
     return;
   }
   else if (message.content.startsWith(`${config.prefix}leave`)) {
-    message.member.voice.channel.join();
+    try {
+      message.member.voice.channel.leave();
+      _connection = null;
+    } catch (error) {
+      console.log(error)
+    }
     return;
   }
   else {
