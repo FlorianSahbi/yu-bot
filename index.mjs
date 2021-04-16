@@ -76,9 +76,9 @@ const playMusic = async (message) => {
       message.channel.send(_activePlaylist[0].url)
     } else {
       m.reply(`Failed with ${m.content}`)
-    } 
+    }
   });
-  
+
   collector.on('end', collected => {
     message.channel.send(`Time's up`);
   });
@@ -165,6 +165,10 @@ client.on("message", async message => {
   }
   else if (message.content.startsWith(`${config.prefix}blindtest`)) {
     manageTags(message, 5, 1);
+    return;
+  }
+  else if (message.content.startsWith(`${config.prefix}leave`)) {
+    message.member.voice.channel.join();
     return;
   }
   else {
