@@ -147,7 +147,23 @@ const playMusic = async (message) => {
     })
     .on("error", error => console.error(error));
   dispatcher.setVolumeLogarithmic(5 / 5);
-  message.channel.send(`Start playing: **${_activePlaylist[0].title}**`);
+  const m = await message.channel.send(`Start playing: **${_activePlaylist[0].title}**`);
+
+  const filter = m => !m.author.bot;
+
+  const collector = m.channel.createMessageCollector(filter, { time: 15000 });
+  collector.on('collect', m => {
+    if (_activePlaylist[0].title === m.content) {
+      // m.delete()
+      m.reply(`Got it with ${m.content}`);
+    } else {
+      m.reply(`Failed with ${m.content}`)
+    } 
+  });
+  
+  collector.on('end', collected => {
+    message.channel.send(`Time's up`);
+  });
 }
 
 const skipMusic = (message) => {
@@ -300,12 +316,47 @@ client.on("message", async message => {
     return;
   }
 
+  else if (message.content.startsWith(`${config.prefix}ping`)) {
+    message.channel.send("pong");
+    return;
+  }
+
   else if (message.content.startsWith(`${config.prefix}guess`)) {
     guessMusic(message);
     return;
   }
 
+  else if (message.content.startsWith(`${config.prefix}polik`)) {
+    const filter = m => !m.author.bot;
+    const m = await message.channel.send("test")
+    const collector = m.channel.createMessageCollector(filter, { time: 15000 });
+    collector.on('collect', m => {
+      if (good.includes(m.content)) {
+        m.delete()
+        m.reply(`Got it`);
+      } else {
+        // m.reply("keep tryin'")
+      } 
+    });
+    
+    collector.on('end', collected => {
+      message.channel.send(`Time's up`);
+    });
+
+    // m.channel.awaitMessages(filter, { time: 5000 })
+    // .then(collected => {
+    //   console.log(collected.map(c => c.content))
+    //   message.channel.send(`${collected.first().author} got the correct answer!`);
+    // })
+    // .catch(collected => {
+    //   console.log(collected.map(c => c.content))
+    //   message.channel.send('Looks like nobody got the answer this time.');
+    // });
+    return;
+  }
+
   else {
+    console.log("okokookokokookkoko")
     message.channel.send("You need to enter a valid command!");
   }
 });
