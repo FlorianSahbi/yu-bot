@@ -13,15 +13,16 @@ const addRound = async (variables) => {
 
 const lookingForSound = async (message, game) => {
   console.log("DEBUG::lookingForSound");
-
+  console.log({ input: game })
   const variables = { tag: game.tags[0]._id };
-  console.log(variables)
-  await message.channel.send("Looking for a song");
+  // await message.channel.send("Looking for a song");
   const { randomSong } = await getRandomSongFromDb(variables);
-  const variablesAddRound = {id: game._id, positionRound: 1 , song: randomSong._id};
-  const nexwState = await addRound(variablesAddRound);
-  console.log(nexwState)
-  playMusic(message, randomSong, game)
+  const variablesAddRound = { id: game._id, position: 1, song: randomSong._id };
+  console.log(variablesAddRound)
+  const { updateGameAddRound } = await addRound(variablesAddRound);
+  console.log(updateGameAddRound)
+  console.log({ output: updateGameAddRound })
+  playMusic(message, randomSong, updateGameAddRound)
 }
 
 export default lookingForSound;

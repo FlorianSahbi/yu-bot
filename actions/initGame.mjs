@@ -2,9 +2,9 @@ import { request } from 'graphql-request';
 import ADD_GAME from "../graphql/addGame.mjs";
 import askJoin from "./askJoin.mjs";
 
-const createGame = async (variables) => {
+const createGame = async () => {
   try {
-    return await request(process.env.YU_API, ADD_GAME, variables);
+    return await request(process.env.YU_API, ADD_GAME, {});
   } catch (error) {
     console.error(error);
   }
@@ -12,8 +12,9 @@ const createGame = async (variables) => {
 
 const initGame = async (message) => {
   console.log("DEBUG::initGame")
-  const variables = { players: [], tags: [], history: [] }
-  const { addGame } = await createGame(variables);
+  console.log({ input: null })
+  const { addGame } = await createGame();
+  console.log({ output: addGame })
   askJoin(message, addGame);
 }
 

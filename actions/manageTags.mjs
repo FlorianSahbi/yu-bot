@@ -1,10 +1,10 @@
 import GET_TAGS from "../graphql/tags.mjs";
-import UPDATE_GAME from "../graphql/updateGame.mjs";
+import UPDATE_GAME_ADD_TAGS from "../graphql/updateGameAddTags.mjs";
 import showSettings from "./showSettings.mjs";
 import { request } from 'graphql-request';
 
 const updateGameWithTags = async (variables) => {
-  return await request(process.env.YU_API, UPDATE_GAME, variables);
+  return await request(process.env.YU_API, UPDATE_GAME_ADD_TAGS, variables);
 }
 
 const sendValidationMessage = async (message, tag) => {
@@ -51,6 +51,7 @@ const getTags = async () => {
 // Affiche le message qui permet à l'utilisateur de selectionner un tag dans une list recupérée sur le db
 const manageTags = async (message, game) => {
   console.log("DEBUG::manageTags")
+  console.log({ input: game })
 
   const tags = await getTags();
   const tagsMessage = await sendTagsMessage(message.channel, await generateListOfTags(tags))
@@ -63,10 +64,11 @@ const manageTags = async (message, game) => {
       const selectedTag = await tags.find(({ name }) => name === message.content);
       message.delete();
       await sendValidationMessage(message, selectedTag);
-      const variables = { id: game._id, tags: [selectedTag._id], players: [...game.players.map((user) => user._id)] };
-      const { updateGame } = await updateGameWithTags(variables)
+      const variables = { id: game._id, tags: selectedTag._id };
+      const { updateGameAddTags } = await updateGameWithTags(variables)
       await collector.stop();
-      showSettings(message, game)
+      console.log({ output: updateGameAddTags })
+      showSettings(message, updateGameAddTags)
     } else {
       message.reply(`${message.content} does not exists`);
     }

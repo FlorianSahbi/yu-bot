@@ -1,17 +1,9 @@
 import { gql } from 'graphql-request';
 import { CORE_HISTORY_FIELDS, CORE_TAG_FIELDS, CORE_USER_FIELDS, CORE_GAME_FIELDS } from "../fragments.mjs";
 
-const UPDATE_GAME = gql`
-  mutation UpdateGame(
-    $id: ID
-    $players: [ID]
-    $tags: [ID]
-  ) {
-    updateGame(
-      id: $id
-      players: $players
-      tags: $tags
-    ) {
+const UPDATE_GAME_ADD_PLAYERS = gql`
+  mutation UpdateGameAddPlayers($id: ID, $players: [ID]) {
+    updateGameAddPlayers(id: $id, players: $players) {
       ...CoreGameFields
       players {
         ...CoreUserFields
@@ -28,4 +20,4 @@ const UPDATE_GAME = gql`
   ${CORE_GAME_FIELDS}
 `;
 
-export default UPDATE_GAME;
+export default UPDATE_GAME_ADD_PLAYERS;

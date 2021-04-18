@@ -1,22 +1,12 @@
+import UPDATE_GAME_ADD_PLAYERS from "../graphql/updateGameAddPlayers.mjs";
 import GET_USERS from "../graphql/users.mjs";
-import UPDATE_GAME from "../graphql/updateGame.mjs";
 import manageTags from "./manageTags.mjs";
 import { request } from 'graphql-request';
 
-// DATA HERE
-// {
-// _id: '607b882adc075cfc2f1d71dc',
-// name: "Yu's game",
-// points: 100,
-// trackTime: 10000,
-// players: [],
-// tags: [],
-// history: []
-// }
-// Affiche le message qui permet à Yu d'annoncer aux utilisateurs qu'une partie est en train de se lancer
 
+// Affiche le message qui permet à Yu d'annoncer aux utilisateurs qu'une partie est en train de se lancer
 const updateGameWithPlayers = async (variables) => {
-  return await request(process.env.YU_API, UPDATE_GAME, variables);
+  return await request(process.env.YU_API, UPDATE_GAME_ADD_PLAYERS, variables);
 }
 
 const getUsersByDiscordId = async (users, discordIds) => {
@@ -59,6 +49,7 @@ const sendMessage = async (message) => {
 
 const askJoin = async (message, game) => {
   console.log("DEBUG::askJoin")
+  console.log({ input: game })
 
   const joinMessage = await sendMessage(message);
   await joinMessage.react("👍");
@@ -78,9 +69,10 @@ const askJoin = async (message, game) => {
     if (players.length <= 0) {
       message.channel.send("No enough players, END");
     } else {
-      const variables = { id: game._id, tags: [], players };
-      const { updateGame } = await updateGameWithPlayers(variables);
-      manageTags(message, updateGame);
+      const variables = { id: game._id, players };
+      const { updateGameAddPlayers } = await updateGameWithPlayers(variables);
+      console.log({ output: updateGameAddPlayers })
+      manageTags(message, updateGameAddPlayers);
     }
   });
 }

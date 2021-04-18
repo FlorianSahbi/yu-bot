@@ -3,12 +3,14 @@ import {gql} from 'graphql-request';
 export const CORE_HISTORY_FIELDS = gql`
   fragment CoreHistoryFields on Game {
     history {
+      _id
       song {
         title
         cover
       }
       position
       rank {
+        _id
         position
         player {
           _id
@@ -25,6 +27,38 @@ export const CORE_TAG_FIELDS = gql`
     _id
     name
     cover
+  }
+`;
+
+export const CORE_ROUND_FIELDS = gql`
+  fragment CoreRoundFields on Tag {
+    _id
+    position
+    song {
+      _id
+      title
+    }
+    rank {
+      _id
+      position
+      points
+      user {
+        _id
+        username
+      }
+    }
+  }
+`;
+
+export const CORE_RANK_FIELDS = gql`
+  fragment CoreRankFields on Tag {
+    _id
+    position
+    points
+    user {
+      _id
+      username
+    }
   }
 `;
 
