@@ -51,7 +51,7 @@ const getTags = async () => {
 // Affiche le message qui permet à l'utilisateur de selectionner un tag dans une list recupérée sur le db
 const manageTags = async (message, game) => {
   console.log("DEBUG::manageTags")
-  console.log({ input: game })
+  // console.log({ input: game })
 
   const tags = await getTags();
   const tagsMessage = await sendTagsMessage(message.channel, await generateListOfTags(tags))
@@ -67,7 +67,7 @@ const manageTags = async (message, game) => {
       const variables = { id: game._id, tags: selectedTag._id };
       const { updateGameAddTags } = await updateGameWithTags(variables)
       await collector.stop();
-      console.log({ output: updateGameAddTags })
+      // console.log({ output: updateGameAddTags })
       showSettings(message, updateGameAddTags)
     } else {
       message.reply(`${message.content} does not exists`);

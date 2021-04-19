@@ -49,7 +49,7 @@ const sendMessage = async (message) => {
 
 const askJoin = async (message, game) => {
   console.log("DEBUG::askJoin")
-  console.log({ input: game })
+  // console.log({ input: game })
 
   const joinMessage = await sendMessage(message);
   await joinMessage.react("👍");
@@ -71,7 +71,7 @@ const askJoin = async (message, game) => {
     } else {
       const variables = { id: game._id, players };
       const { updateGameAddPlayers } = await updateGameWithPlayers(variables);
-      console.log({ output: updateGameAddPlayers })
+      // console.log({ output: updateGameAddPlayers })
       manageTags(message, updateGameAddPlayers);
     }
   });

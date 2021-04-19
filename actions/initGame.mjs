@@ -12,9 +12,9 @@ const createGame = async () => {
 
 const initGame = async (message) => {
   console.log("DEBUG::initGame")
-  console.log({ input: null })
+  // console.log({ input: null })
   const { addGame } = await createGame();
-  console.log({ output: addGame })
+  // console.log({ output: addGame })
   askJoin(message, addGame);
 }
 

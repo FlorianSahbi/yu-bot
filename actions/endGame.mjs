@@ -1,7 +1,7 @@
 const endGame = async (message) => {
   const m = await message.channel.send({
     embed: {
-      description: "Game finished",
+      description: "END",
       author: {
         name: 'Yu',
         icon_url: 'https://yu-client.vercel.app/yu.png',

@@ -57,7 +57,8 @@ const sendRecapMessage = async (message, goal, time, tag, players) => {
 
 const showSettings = async (message, game) => {
   console.log("DEBUG::showSettings");
-
+  // console.log({ input: game })
+  
   const variables = { id: game._id };
   const gameData = await getGame(variables);
 
