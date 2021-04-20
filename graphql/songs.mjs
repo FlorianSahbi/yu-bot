@@ -1,5 +1,5 @@
 import {gql} from 'graphql-request';
-import {CORE_SONG_FIELDS} from "../fragments.mjs";
+import {CORE_SONG_FIELDS} from "./fragments.mjs";
 
 const GET_SONGS = gql`
   query Songs($tag: ID) {

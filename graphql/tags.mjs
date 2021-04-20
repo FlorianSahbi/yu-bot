@@ -1,5 +1,5 @@
 import {gql} from 'graphql-request';
-import {CORE_TAG_FIELDS, PAGINATION_FIELDS} from "../fragments.mjs";
+import {CORE_TAG_FIELDS, PAGINATION_FIELDS} from "./fragments.mjs";
 
 const GET_TAGS = gql`
   query Tags($limit: Int, $page: Int) {
