@@ -1,6 +1,7 @@
 import { Client } from "discord.js";
 import debuggerLog from "./utils/debuggerLog.mjs";
-import gameManager, { sendHelpMessage } from "./actions/gameManager.mjs";
+import gameManager from "./actions/gameManager.mjs";
+import { sendHelpMessage } from "./messageService.mjs";
 import sendErrorMessage from "./utils/bot/sendErrorMessage.mjs";
 
 const client = new Client();
