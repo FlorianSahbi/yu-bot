@@ -18,18 +18,24 @@ import {
 export const attachMessageCollectorJoin = async (joinMessage, message, game) => {
   debuggerLog(new Date, "CC - collectors.attachMessageCollectorJoin", "Start");
   return new Promise(async (resolve, reject) => {
-    const filter = (reaction, user) => (reaction.emoji.name === "👍" && !user.bot) || (reaction.emoji.name === "✅" && !user.bot && user.id === message.author.id);
+    const filter = (reaction, user) => (reaction.emoji.name === "👍" && !user.bot) || ((reaction.emoji.name === "✅" || reaction.emoji.name === "🚫") && !user.bot && user.id === message.author.id);
     const joinMessageCollector = await joinMessage.createReactionCollector(filter);
 
     joinMessageCollector.on('collect', (reaction) => {
-      if (reaction.emoji.name === "✅") {
+      if (reaction.emoji.name === "✅" || reaction.emoji.name === "🚫") {
         joinMessageCollector.stop();
       }
-    });
+    })
 
     joinMessageCollector.on('end', async (collected) => {
-      resolve(await updateAndAdd(collected, game._id));
-    });
+      if (collected.firstKey(2).includes("✅")) {
+        await updateAndAdd(collected, game._id)
+        resolve(true);
+      } else if (collected.firstKey(2).includes("🚫")) {
+        resolve(false);
+      }
+    })
+
   })
 }
 
@@ -58,42 +64,46 @@ export const attachMessageCollectorRecap = async (recapMessage, message) => {
   debuggerLog(new Date, "CC - collectors.attachMessageCollectorSongPlaying", "Start");
   return new Promise(async (resolve, reject) => {
     const filter = (reaction, user) => (reaction.emoji.name === "✅" || reaction.emoji.name === "🚫") && !user.bot && user.id === message.author.id;
-    const recapMessageCollector = recapMessage.createReactionCollector(filter, { max: 1, time: 30000 });
+    const recapMessageCollector = recapMessage.createReactionCollector(filter, { max: 1 });
 
-    recapMessageCollector.on('collect', async (reaction, user) => {
-      if (reaction.emoji.name === "✅") {
+    recapMessageCollector.on('collect', (reaction) => {
+      if (reaction.emoji.name === "✅" || reaction.emoji.name === "🚫") {
         recapMessageCollector.stop();
       }
-      // if (reaction.emoji.name === "🚫") {
-      //   // recapMessageCollector.stop();
-      //   return;
-      // }
-    });
+    })
 
-    recapMessageCollector.on('end', (reaction, user) => {
-      resolve(true)
-    });
+    recapMessageCollector.on('end', async (collected) => {
+      if (collected.firstKey() === "✅") {
+        resolve(true);
+      } else if (collected.firstKey() === "🚫") {
+        resolve(false);
+      }
+    })
   })
 }
 
-export const attachMessageCollectorSongPlaying = async (songPlayingMessage, message, game, dispatcher, song) => {
-  debuggerLog(new Date, "CC - collectors.attachMessageCollectorSongPlaying", "Start");
+export const attachMessageCollectorSongPlaying = async (round, songPlayingMessage, message, game, dispatcher, song, startTime, position, usersWithAnswer) => {
+  debuggerLog(new Date, "CC - collectors.attachMessageCollectorSongPlaying", "0");
   return new Promise(async (resolve, reject) => {
-    // const alreadyFindAnswer = (message, finders) => finders.find((u) => finders.includes(message.author.id));
-    const filter = (m) => !m.author.bot; // Improve attachMessageCollectorSongPlaying players in game not other
+    const alreadyFindAnswer = (message, usersWithAnswer) => usersWithAnswer.includes(message.author.id);
+    const filter = (m) => !m.author.bot // Improve attachMessageCollectorSongPlaying players in game not other
     const songPlayingMessageCollector = songPlayingMessage.channel.createMessageCollector(filter, { time: game.trackTime });
 
     songPlayingMessageCollector.on('collect', async (message) => {
-      if (song.correctWords.includes(message.content)) {
+      if (song.correctWords.includes(message.content) && !alreadyFindAnswer(message, usersWithAnswer)) {
         message.delete()
         message.reply(`got it`);
-        await addRank(game._id, 1, 1, game.players[0]._id, getPoints(1) + -(differenceInSeconds(new Date(), new Date()) - (game.trackTime / 1000)));
+        await addRank(game._id, round, position, game.players.find((user) => user.discordId === message.author.id)._id, getPoints(position) + -(differenceInSeconds(new Date(), startTime) - (game.trackTime / 1000)));
+        position = position + 1;
+        usersWithAnswer = [...usersWithAnswer, message.author.id];
+      } else if (song.correctWords.includes(message.content) && alreadyFindAnswer(message, usersWithAnswer)) {
+        message.delete();
+        message.reply("you already found it");
       }
     });
 
     songPlayingMessageCollector.on('end', async () => {
       dispatcher.end();
-      resolve(true)
     });
   })
 }

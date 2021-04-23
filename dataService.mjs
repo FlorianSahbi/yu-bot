@@ -14,11 +14,12 @@ import GET_LEADERBOARD from "./graphql/getLeaderbord.mjs";
 // REQUESTS //
 //////////////
 
-export const createGame = () => {
+export const createGame = async () => {
   debuggerLog(new Date, "DS - dataService.createGame", "Start");
   try {
     const variables = {};
-    return request(process.env.YU_API, ADD_GAME, variables);
+    const { addGame } = await request(process.env.YU_API, ADD_GAME, variables);
+    return addGame;
   } catch (error) {
     debuggerLog(new Date, "Error - createGame", error);
   }
@@ -27,7 +28,7 @@ export const createGame = () => {
 export const updateAndAdd = (collected, id) => {
   debuggerLog(new Date, "DS - dataService.updateAndAdd", "Start");
   try {
-    const variables = { id, discordIds: collected.first().users.cache.filter(user => !user.bot).map(({ id }) => id) };
+    const variables = { id, userDiscordData: collected.first().users.cache.filter(user => !user.bot).map((user) => ({ id: user.id, username: user.username, avatar: user.avatarURL() })) };
     return request(process.env.YU_API, UPDATE_AND_ADD, variables);
   } catch (error) {
     debuggerLog(new Date, "Error - updateAndAdd", error);
@@ -54,11 +55,12 @@ export const updateGameWithTags = (id, tags) => {
   }
 }
 
-export const getGame = (id) => {
+export const getGame = async (id) => {
   debuggerLog(new Date, "DS - dataService.getGame", "Start");
   try {
     const variables = { id };
-    return request(process.env.YU_API, GET_GAME, variables);
+    const { game } = await request(process.env.YU_API, GET_GAME, variables);
+    return game;
   } catch (error) {
     debuggerLog(new Date, "Error - getGame", error);
   }
@@ -91,5 +93,15 @@ export const addRank = (id, round, position, player, points) => {
     return request(process.env.YU_API, UPDATE_GAME_ADD_RANK, variables);
   } catch (error) {
     debuggerLog(new Date, "Error - addRound", error);
+  }
+}
+
+export const getLeaderbord = (gameId) => {
+  debuggerLog(new Date, "DS - dataService.getLeaderbord", "Start");
+  try {
+    const variables = { gameId };
+    return request(process.env.YU_API, GET_LEADERBOARD, variables);
+  } catch (error) {
+    debuggerLog(new Date, "Error - getLeaderbord", error);
   }
 }

@@ -12,7 +12,7 @@ const author = {
 //////////////
 
 export const sendHelpMessage = async (message) => {
-debuggerLog(new Date, "MS - messageService.sendHelpMessage", "Start");
+  debuggerLog(new Date, "MS - messageService.sendHelpMessage", "Start");
   const helpMessageEmbed = {
     embed: {
       color,
@@ -31,7 +31,7 @@ debuggerLog(new Date, "MS - messageService.sendHelpMessage", "Start");
 }
 
 export const sendJoinMessage = async (message) => {
-debuggerLog(new Date, "MS - messageService.sendJoinMessage", "Start");
+  debuggerLog(new Date, "MS - messageService.sendJoinMessage", "Start");
   const joinMessageEmbed = {
     embed: {
       color,
@@ -46,21 +46,27 @@ debuggerLog(new Date, "MS - messageService.sendJoinMessage", "Start");
           name: "Lock in",
           value: "React with ✅ (Game author only)",
         },
+        {
+          name: "Cancel",
+          value: "React with 🚫 (Game author only)",
+        },
       ],
     }
   };
   const joinMessage = await message.channel.send(joinMessageEmbed);
   joinMessage.react("👍");
   joinMessage.react("✅");
+  joinMessage.react("🚫");
   return joinMessage;
 }
 
 export const sendTagsMessage = async (message, tags) => {
-debuggerLog(new Date, "MS - messageService.sendTagsMessage", "Start");
+  debuggerLog(new Date, "MS - messageService.sendTagsMessage", "Start");
   const tagsMessageEmbed = {
     embed: {
       color,
       author,
+      description: "Type `tag-name` to select it.",
       fields: [
         {
           name: "Tags",
@@ -74,7 +80,7 @@ debuggerLog(new Date, "MS - messageService.sendTagsMessage", "Start");
 }
 
 export const sendValidationMessage = async (message, tag) => {
-debuggerLog(new Date, "MS - messageService.sendValidationMessage", "Start");
+  debuggerLog(new Date, "MS - messageService.sendValidationMessage", "Start");
   const validationMessageEmbed = {
     embed: {
       color,
@@ -90,7 +96,7 @@ debuggerLog(new Date, "MS - messageService.sendValidationMessage", "Start");
 }
 
 export const sendRecapMessage = async (message, goal, time, tag, tagCover, players) => {
-debuggerLog(new Date, "MS - messageService.sendRecapMessage", "Start");
+  debuggerLog(new Date, "MS - messageService.sendRecapMessage", "Start");
   const recapMessageEmbed = {
     embed: {
       author,
@@ -115,8 +121,7 @@ debuggerLog(new Date, "MS - messageService.sendRecapMessage", "Start");
         },
         {
           name: "Ok with it ?",
-          value: "React with ✅ to confirm (Game author only)",
-          // value: "React with ✅ to confirm or 🚫 to cancel (Game author only)",
+          value: "React with ✅ to confirm or 🚫 to cancel (Game author only)",
         },
       ],
       image: {
@@ -126,66 +131,68 @@ debuggerLog(new Date, "MS - messageService.sendRecapMessage", "Start");
   };
   const recapMessage = await message.channel.send(recapMessageEmbed);
   recapMessage.react("✅");
-  // recapMessage.react("🚫");
+  recapMessage.react("🚫");
   return recapMessage;
 }
 
-export const sendSongPlayingMessage = async (message, round) => {
-debuggerLog(new Date, "MS - messageService.sendSongPlayingMessage", "Start");
+export const sendSongPlayingMessage = async (message, round, score) => {
+  debuggerLog(new Date, "MS - messageService.sendSongPlayingMessage", "Start");
   const songPlayingMessageEmbed = {
     embed: {
-      author,
       color,
+      author,
       title: `Round : ${round} - Track is playing 🎶`,
-      description: "https://thumbs.gfycat.com/FlimsyTemptingBlackfish-size_restricted.gif",
+      fields: score.map((score) => ({ name: score.player.username, value: `${score.points}pts` })),
     }
   };
   const songPlayingMessage = await message.channel.send(songPlayingMessageEmbed);
   return songPlayingMessage;
 }
 
-export const sendSongMessage = async (message, title, cover) => {
-debuggerLog(new Date, "MS - messageService.sendSongMessage", "Start");
+export const sendSongMessage = async (message, title, cover, url) => {
+  debuggerLog(new Date, "MS - messageService.sendSongMessage", "Start");
   const songMessageEmbed = {
     embed: {
       color,
-      author,
-      description: `The song was : ${title}`,
-      // description: `The song was : ${title}`,
-      // image: {
-      //   url: cover,
-      // },
+      title: `The song was : ${title}`,
+      url: url,
+      thumbnail: {
+        url: cover,
+      },
     }
   };
   const songMessage = await message.channel.send(songMessageEmbed);
   return songMessage;
 }
 
-export const sendEndGameMessage = async (message) => {
-debuggerLog(new Date, "MS - messageService.sendEndGameMessage", "Start");
+export const sendRoundMessage = async (message, lb) => {
+  debuggerLog(new Date, "MS - messageService.sendEndGameMessage", "Start");
+  const fi = lb.getLeaderboard.map(rank => ({ name: rank.player.username, value: rank.points }))
+  const roundMessageEmbed = {
+    embed: {
+      color,
+      author,
+      description: "END",
+      fields: fi,
+      timestamp: new Date(),
+      footer: {
+        text: 'Thank you for using Yu 🌸',
+      },
+    }
+  };
+  const roundMessage = await message.channel.send(roundMessageEmbed);
+  return roundMessage;
+}
+
+export const sendEndGameMessage = async (message, lb) => {
+  debuggerLog(new Date, "MS - messageService.sendEndGameMessage", "Start");
+
   const endGameMessageEmbed = {
     embed: {
       color,
       author,
       description: "END",
-      fields: [
-        {
-          name: "Rank",
-          value: "1st to last",
-        },
-        {
-          name: "1/7 : Beelphiew#0000",
-          value: "102pts",
-        },
-        {
-          name: "2/7 : Dral#0000",
-          value: "82pts",
-        },
-        {
-          name: "3/7 : Flo#0000",
-          value: "62pts",
-        },
-      ],
+      fields: lb.map(b => ({ name: b.player.username, value: `${b.points}pts` })),
       timestamp: new Date(),
       footer: {
         text: 'Thank you for using Yu 🌸',
