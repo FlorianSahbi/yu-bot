@@ -1,10 +1,10 @@
-import debuggerLog from "./utils/debuggerLog.mjs";
+const {debuggerLog} = require("./utils/debuggerLog");
 
 ///////////
 // UTILS //
 ///////////
 
-export const joinVoiceChannel = async (message) => {
+exports.joinVoiceChannel = async (message) => {
   debuggerLog(new Date, "NN - joinVoiceChannel", "Start");
   if (!message.member.voice.channel) {
     message.channel.send("You need to be in a voice channel to play music!");
@@ -22,7 +22,7 @@ export const joinVoiceChannel = async (message) => {
   }
 }
 
-export const leaveVoiceChannel = async (message) => {
+exports.leaveVoiceChannel = async (message) => {
   debuggerLog(new Date, "NN - leaveVoiceChannel", "Start");
   try {
     message.member.voice.channel.leave();
@@ -32,7 +32,7 @@ export const leaveVoiceChannel = async (message) => {
   }
 }
 
-export const getPoints = (number) => {
+exports.getPoints = (number) => {
   if (number === 1) {
     return 35;
   } else if (number === 2) {

@@ -1,6 +1,6 @@
-import debuggerLog from "../debuggerLog.mjs";
+const debuggerLog = require("../debuggerLog");
 
-const sendErrorMessage = async (channel, description) => {
+exports.sendErrorMessage = async (channel, description) => {
   try {
     const error = { embed: { color: "#ff0000", description } };
     const errorMessage = await channel.send(error);
@@ -8,5 +8,3 @@ const sendErrorMessage = async (channel, description) => {
     debuggerLog(new Date(), "sendErrorMessage", error);
   }
 }
-
-export default sendErrorMessage;

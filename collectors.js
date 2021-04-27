@@ -1,21 +1,21 @@
-import { differenceInSeconds } from "date-fns";
-import debuggerLog from "./utils/debuggerLog.mjs";
+const { differenceInSeconds } = require( "date-fns");
+const { debuggerLog } = require( "./utils/debuggerLog");
 
-import {
+const {
   updateAndAdd,
   updateGameWithTags,
   addRank
-} from "./dataService.mjs";
+} = require( "./dataService");
 
-import {
+const {
   getPoints,
-} from "./utils.mjs";
+} = require( "./utils");
 
 ////////////////
 // COLLECTORS //
 ////////////////
 
-export const attachMessageCollectorJoin = async (joinMessage, message, game) => {
+exports.attachMessageCollectorJoin = async (joinMessage, message, game) => {
   debuggerLog(new Date, "CC - collectors.attachMessageCollectorJoin", "Start");
   return new Promise(async (resolve, reject) => {
     const filter = (reaction, user) => (reaction.emoji.name === "👍" && !user.bot) || ((reaction.emoji.name === "✅" || reaction.emoji.name === "🚫") && !user.bot && user.id === message.author.id);
@@ -39,7 +39,7 @@ export const attachMessageCollectorJoin = async (joinMessage, message, game) => 
   })
 }
 
-export const attachMessageCollectorTags = async (tagsMessage, message, game, tags) => {
+exports.attachMessageCollectorTags = async (tagsMessage, message, game, tags) => {
   debuggerLog(new Date, "CC - collectors.attachMessageCollectorTags", "Start");
   return new Promise(async (resolve, reject) => {
     const filter = m => !m.author.bot && m.author.id === message.author.id;
@@ -60,7 +60,7 @@ export const attachMessageCollectorTags = async (tagsMessage, message, game, tag
   });
 }
 
-export const attachMessageCollectorRecap = async (recapMessage, message) => {
+exports.attachMessageCollectorRecap = async (recapMessage, message) => {
   debuggerLog(new Date, "CC - collectors.attachMessageCollectorSongPlaying", "Start");
   return new Promise(async (resolve, reject) => {
     const filter = (reaction, user) => (reaction.emoji.name === "✅" || reaction.emoji.name === "🚫") && !user.bot && user.id === message.author.id;
@@ -82,7 +82,7 @@ export const attachMessageCollectorRecap = async (recapMessage, message) => {
   })
 }
 
-export const attachMessageCollectorSongPlaying = async (round, songPlayingMessage, message, game, dispatcher, song, startTime, position, usersWithAnswer) => {
+exports.attachMessageCollectorSongPlaying = async (round, songPlayingMessage, message, game, dispatcher, song, startTime, position, usersWithAnswer) => {
   debuggerLog(new Date, "CC - collectors.attachMessageCollectorSongPlaying", "0");
   return new Promise(async (resolve, reject) => {
     const alreadyFindAnswer = (message, usersWithAnswer) => usersWithAnswer.includes(message.author.id);
@@ -90,13 +90,13 @@ export const attachMessageCollectorSongPlaying = async (round, songPlayingMessag
     const songPlayingMessageCollector = songPlayingMessage.channel.createMessageCollector(filter, { time: game.trackTime });
 
     songPlayingMessageCollector.on('collect', async (message) => {
-      if (song.correctWords.includes(message.content) && !alreadyFindAnswer(message, usersWithAnswer)) {
+      if (song.answers.includes(message.content) && !alreadyFindAnswer(message, usersWithAnswer)) {
         message.delete()
         message.reply(`got it`);
-        await addRank(game._id, round, position, game.players.find((user) => user.discordId === message.author.id)._id, getPoints(position) + -(differenceInSeconds(new Date(), startTime) - (game.trackTime / 1000)));
+        await addRank(game._id, round, position, game.users.find((user) => user.discordId === message.author.id)._id, getPoints(position) + -(differenceInSeconds(new Date(), startTime) - (game.trackTime / 1000)));
         position = position + 1;
         usersWithAnswer = [...usersWithAnswer, message.author.id];
-      } else if (song.correctWords.includes(message.content) && alreadyFindAnswer(message, usersWithAnswer)) {
+      } else if (song.answers.includes(message.content) && alreadyFindAnswer(message, usersWithAnswer)) {
         message.delete();
         message.reply("you already found it");
       }

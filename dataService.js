@@ -1,31 +1,31 @@
-import { request } from 'graphql-request';
-import debuggerLog from "./utils/debuggerLog.mjs";
-import ADD_GAME from "./graphql/addGame.mjs";
-import UPDATE_AND_ADD from "./graphql/updateAndAdd.mjs";
-import GET_TAGS from "./graphql/tags.mjs";
-import UPDATE_GAME_ADD_TAGS from "./graphql/updateGameAddTags.mjs";
-import GET_GAME from "./graphql/getGame.mjs";
-import GET_RANDOM_SONG from "./graphql/getRandomSong.mjs";
-import UPDATE_GAME_ADD_ROUND from "./graphql/updateGameAddRound.mjs";
-import UPDATE_GAME_ADD_RANK from "./graphql/updateGameAddRank.mjs";
-import GET_LEADERBOARD from "./graphql/getLeaderbord.mjs";
+const { request } = require('graphql-request');
+const { debuggerLog } = require("./utils/debuggerLog");
+const { TAGS } = require("./graphql/tags/tags");
+const { GAME } = require("./graphql/games/game");
+const { RANDOM_TRACK } = require("./graphql/games/randomTrack");
+const { LEADERBOARD } = require("./graphql/games/leaderboard");
+const { CREATE_GAME } = require("./graphql/games/createGame");
+const { UPDATE_AND_ADD } = require("./graphql/games/updateAndAdd");
+const { UPDATE_GAME_ADD_TAGS } = require("./graphql/games/updateGameAddTags");
+const { UPDATE_GAME_ADD_ROUND } = require("./graphql/games/updateGameAddRound");
+const { UPDATE_GAME_ADD_RANK } = require("./graphql/games/updateGameAddRank");
 
 //////////////
 // REQUESTS //
 //////////////
 
-export const createGame = async () => {
+exports.createGame = async () => {
   debuggerLog(new Date, "DS - dataService.createGame", "Start");
   try {
     const variables = {};
-    const { addGame } = await request(process.env.YU_API, ADD_GAME, variables);
-    return addGame;
+    const { createGame } = await request(process.env.YU_API, CREATE_GAME, variables);
+    return createGame;
   } catch (error) {
     debuggerLog(new Date, "Error - createGame", error);
   }
 }
 
-export const updateAndAdd = (collected, id) => {
+exports.updateAndAdd = (collected, id) => {
   debuggerLog(new Date, "DS - dataService.updateAndAdd", "Start");
   try {
     const variables = { id, userDiscordData: collected.first().users.cache.filter(user => !user.bot).map((user) => ({ id: user.id, username: user.username, avatar: user.avatarURL() })) };
@@ -35,17 +35,17 @@ export const updateAndAdd = (collected, id) => {
   }
 }
 
-export const getTags = () => {
+exports.getTags = () => {
   debuggerLog(new Date, "DS - dataService.getTags", "Start");
   try {
     const variables = {};
-    return request(process.env.YU_API, GET_TAGS, {});
+    return request(process.env.YU_API, TAGS, {});
   } catch (error) {
     debuggerLog(new Date, "Error - getTags", error);
   }
 }
 
-export const updateGameWithTags = (id, tags) => {
+exports.updateGameWithTags = (id, tags) => {
   debuggerLog(new Date, "DS - dataService.updateGameWithTags", "Start");
   try {
     const variables = { id, tags };
@@ -55,53 +55,53 @@ export const updateGameWithTags = (id, tags) => {
   }
 }
 
-export const getGame = async (id) => {
+exports.getGame = async (id) => {
   debuggerLog(new Date, "DS - dataService.getGame", "Start");
   try {
     const variables = { id };
-    const { game } = await request(process.env.YU_API, GET_GAME, variables);
+    const { game } = await request(process.env.YU_API, GAME, variables);
     return game;
   } catch (error) {
     debuggerLog(new Date, "Error - getGame", error);
   }
 }
 
-export const getRandomSongFromDb = (tag) => {
-  debuggerLog(new Date, "DS - dataService.getRandomSongFromDb", "Start");
-  try {
-    const variables = { tag };
-    return request(process.env.YU_API, GET_RANDOM_SONG, variables);
-  } catch (error) {
-    debuggerLog(new Date, "Error - getRandomSongFromDb", error);
-  }
-}
-
-export const addRound = (id, position, song) => {
+exports.addRound = (id, position, track) => {
   debuggerLog(new Date, "DS - dataService.addRound", "Start");
   try {
-    const variables = { id, position, song };
+    const variables = { id, roundInput: {position, track} };
     return request(process.env.YU_API, UPDATE_GAME_ADD_ROUND, variables);
   } catch (error) {
     debuggerLog(new Date, "Error - addRound", error);
   }
 }
 
-export const addRank = (id, round, position, player, points) => {
+exports.addRank = (id, round, position, user, points) => {
   debuggerLog(new Date, "DS - dataService.addRank", "Start");
   try {
-    const variables = { id, round, position, player, points };
+    const variables = { id, round, rankInput: {position, user, points} };
     return request(process.env.YU_API, UPDATE_GAME_ADD_RANK, variables);
   } catch (error) {
     debuggerLog(new Date, "Error - addRound", error);
   }
 }
 
-export const getLeaderbord = (gameId) => {
+exports.getLeaderbord = (id) => {
   debuggerLog(new Date, "DS - dataService.getLeaderbord", "Start");
   try {
-    const variables = { gameId };
-    return request(process.env.YU_API, GET_LEADERBOARD, variables);
+    const variables = { id };
+    return request(process.env.YU_API, LEADERBOARD, variables);
   } catch (error) {
     debuggerLog(new Date, "Error - getLeaderbord", error);
+  }
+}
+
+exports.getRandomSongFromDb = (tag) => {
+  debuggerLog(new Date, "DS - dataService.getRandomSongFromDb", "Start");
+  try {
+    const variables = { tag };
+    return request(process.env.YU_API, RANDOM_TRACK, variables);
+  } catch (error) {
+    debuggerLog(new Date, "Error - getRandomSongFromDb", error);
   }
 }

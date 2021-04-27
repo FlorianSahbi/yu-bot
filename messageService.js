@@ -1,4 +1,4 @@
-import debuggerLog from "./utils/debuggerLog.mjs";
+const {debuggerLog} = require("./utils/debuggerLog");
 
 const color = "#ec4999";
 const author = {
@@ -11,7 +11,7 @@ const author = {
 // MESSAGES //
 //////////////
 
-export const sendHelpMessage = async (message) => {
+exports.sendHelpMessage = async (message) => {
   debuggerLog(new Date, "MS - messageService.sendHelpMessage", "Start");
   const helpMessageEmbed = {
     embed: {
@@ -30,7 +30,7 @@ export const sendHelpMessage = async (message) => {
   return helpMessage;
 }
 
-export const sendJoinMessage = async (message) => {
+exports.sendJoinMessage = async (message) => {
   debuggerLog(new Date, "MS - messageService.sendJoinMessage", "Start");
   const joinMessageEmbed = {
     embed: {
@@ -60,7 +60,7 @@ export const sendJoinMessage = async (message) => {
   return joinMessage;
 }
 
-export const sendTagsMessage = async (message, tags) => {
+exports.sendTagsMessage = async (message, tags) => {
   debuggerLog(new Date, "MS - messageService.sendTagsMessage", "Start");
   const tagsMessageEmbed = {
     embed: {
@@ -79,7 +79,7 @@ export const sendTagsMessage = async (message, tags) => {
   return tagsMessage;
 }
 
-export const sendValidationMessage = async (message, tag) => {
+exports.sendValidationMessage = async (message, tag) => {
   debuggerLog(new Date, "MS - messageService.sendValidationMessage", "Start");
   const validationMessageEmbed = {
     embed: {
@@ -87,7 +87,7 @@ export const sendValidationMessage = async (message, tag) => {
       author,
       description: `${message.author.username} has selected \`${tag.name}\``,
       image: {
-        url: tag.cover,
+        url: tag.thumbnail,
       },
     }
   };
@@ -95,7 +95,7 @@ export const sendValidationMessage = async (message, tag) => {
   return validationMessage;
 }
 
-export const sendRecapMessage = async (message, goal, time, tag, tagCover, players) => {
+exports.sendRecapMessage = async (message, goal, time, tag, tagCover, players) => {
   debuggerLog(new Date, "MS - messageService.sendRecapMessage", "Start");
   const recapMessageEmbed = {
     embed: {
@@ -135,21 +135,21 @@ export const sendRecapMessage = async (message, goal, time, tag, tagCover, playe
   return recapMessage;
 }
 
-export const sendSongPlayingMessage = async (message, round, score) => {
+exports.sendSongPlayingMessage = async (message, round, score) => {
   debuggerLog(new Date, "MS - messageService.sendSongPlayingMessage", "Start");
   const songPlayingMessageEmbed = {
     embed: {
       color,
       author,
       title: `Round : ${round} - Track is playing 🎶`,
-      fields: score.map((score) => ({ name: score.player.username, value: `${score.points}pts` })),
+      fields: score.map((s) => ({ name: s.player.username, value: `${s.points}pts` })),
     }
   };
   const songPlayingMessage = await message.channel.send(songPlayingMessageEmbed);
   return songPlayingMessage;
 }
 
-export const sendSongMessage = async (message, title, cover, url) => {
+exports.sendSongMessage = async (message, title, cover, url) => {
   debuggerLog(new Date, "MS - messageService.sendSongMessage", "Start");
   const songMessageEmbed = {
     embed: {
@@ -165,9 +165,9 @@ export const sendSongMessage = async (message, title, cover, url) => {
   return songMessage;
 }
 
-export const sendRoundMessage = async (message, lb) => {
+exports.sendRoundMessage = async (message, lb) => {
   debuggerLog(new Date, "MS - messageService.sendEndGameMessage", "Start");
-  const fi = lb.getLeaderboard.map(rank => ({ name: rank.player.username, value: rank.points }))
+  const fi = lb.getLeaderboard.map(rank => ({ name: rank.user.username, value: rank.points }))
   const roundMessageEmbed = {
     embed: {
       color,
@@ -184,7 +184,7 @@ export const sendRoundMessage = async (message, lb) => {
   return roundMessage;
 }
 
-export const sendEndGameMessage = async (message, lb) => {
+exports.sendEndGameMessage = async (message, lb) => {
   debuggerLog(new Date, "MS - messageService.sendEndGameMessage", "Start");
 
   const endGameMessageEmbed = {

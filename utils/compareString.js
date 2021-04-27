@@ -1,4 +1,4 @@
-function compareString(given, expected) {
+exports.compareString = (given, expected) => {
   if (!given || !expected) {
     return "Missing something..."
   }
@@ -22,5 +22,3 @@ function compareString(given, expected) {
 
   return "Euuh..."
 }
-
-exports.compareString = compareString;
