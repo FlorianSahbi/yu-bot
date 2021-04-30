@@ -36,7 +36,9 @@ exports.CORE_USER_FIELDS = gql`
     _id
     username
     avatar
-    discordId
+    discordData {
+      id
+    }
     playCount
     createdAt
     updatedAt

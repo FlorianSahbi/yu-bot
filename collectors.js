@@ -1,15 +1,15 @@
-const { differenceInSeconds } = require( "date-fns");
-const { debuggerLog } = require( "./utils/debuggerLog");
+const { differenceInSeconds } = require("date-fns");
+const { debuggerLog } = require("./utils/debuggerLog");
 
 const {
   updateAndAdd,
   updateGameWithTags,
   addRank
-} = require( "./dataService");
+} = require("./dataService");
 
 const {
   getPoints,
-} = require( "./utils");
+} = require("./utils");
 
 ////////////////
 // COLLECTORS //
@@ -28,6 +28,10 @@ exports.attachMessageCollectorJoin = async (joinMessage, message, game) => {
     })
 
     joinMessageCollector.on('end', async (collected) => {
+      if (collected.firstKey(1)[0] === "✅") {
+        message.channel.send("Can't start a game with no one in it - Game cancel");
+        resolve(false);
+      }
       if (collected.firstKey(2).includes("✅")) {
         await updateAndAdd(collected, game._id)
         resolve(true);
@@ -93,7 +97,7 @@ exports.attachMessageCollectorSongPlaying = async (round, songPlayingMessage, me
       if (song.answers.includes(message.content) && !alreadyFindAnswer(message, usersWithAnswer)) {
         message.delete()
         message.reply(`got it`);
-        await addRank(game._id, round, position, game.users.find((user) => user.discordId === message.author.id)._id, getPoints(position) + -(differenceInSeconds(new Date(), startTime) - (game.trackTime / 1000)));
+        await addRank(game._id, round, position, game.users.find((user) => user.discordData.id === message.author.id)._id, getPoints(position) + -(differenceInSeconds(new Date(), startTime) - (game.trackTime / 1000)));
         position = position + 1;
         usersWithAnswer = [...usersWithAnswer, message.author.id];
       } else if (song.answers.includes(message.content) && alreadyFindAnswer(message, usersWithAnswer)) {

@@ -96,6 +96,7 @@ exports.sendValidationMessage = async (message, tag) => {
 }
 
 exports.sendRecapMessage = async (message, goal, time, tag, tagCover, players) => {
+  console.log({goal, time, tag, tagCover, players})
   debuggerLog(new Date, "MS - messageService.sendRecapMessage", "Start");
   const recapMessageEmbed = {
     embed: {
@@ -125,7 +126,7 @@ exports.sendRecapMessage = async (message, goal, time, tag, tagCover, players) =
         },
       ],
       image: {
-        url: tagCover,
+        url: tagCover? tagCover: "https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg",
       }
     }
   };
