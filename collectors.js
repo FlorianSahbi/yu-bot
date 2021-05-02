@@ -136,7 +136,7 @@ exports.attachMessageCollectorSongPlaying = async (round, songPlayingMessage, me
   return new Promise(async (resolve, reject) => {
     const alreadyFindAnswer = (message, usersWithAnswer) => usersWithAnswer.includes(message.author.id);
     const filter = (m) => !m.author.bot // Improve attachMessageCollectorSongPlaying players in game not other
-    const songPlayingMessageCollector = songPlayingMessage.channel.createMessageCollector(filter, { time: config.config.timeCollectors });
+    const songPlayingMessageCollector = songPlayingMessage.channel.createMessageCollector(filter, { time: 30000 });
 
     songPlayingMessageCollector.on('collect', async (message) => {
       if (song.answers.map((answer) => answer.trim().toLowerCase()).includes(message.content.trim().toLowerCase()) && !alreadyFindAnswer(message, usersWithAnswer)) {

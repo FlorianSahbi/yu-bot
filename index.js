@@ -8,7 +8,7 @@ const { joinVoiceChannel } = require("./utils");
 
 let timeoutId = null;
 const client = new Client();
-exports.config = { prefix: "!", timeCollectors: 10000 };
+exports.config = { prefix: "!", timeCollectors: 30000 };
 const config = { prefix: "!" };
 
 client.once("ready", () => {
