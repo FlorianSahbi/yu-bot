@@ -43,7 +43,7 @@ const playlistMod = async (message, game, connection, round = 1, position = 1, u
   } else {
     const { leaderboard } = await getLeaderbord(game._id);
     await updateGuildIsPlaying(message.guild.id, false);
-    await sendEndGameMessage(message, leaderboard);
+    await sendEndGameMessage(message, leaderboard, game);
   }
   debuggerLog(new Date, "01 - PlaylistMod.Init", "1");
 }

@@ -188,14 +188,15 @@ exports.sendRoundMessage = async (message, lb) => {
   return roundMessage;
 }
 
-exports.sendEndGameMessage = async (message, lb) => {
+exports.sendEndGameMessage = async (message, lb, game) => {
   debuggerLog(new Date, "MS - messageService.sendEndGameMessage", "Start");
 
   const endGameMessageEmbed = {
     embed: {
       color,
       author,
-      description: "END",
+      title: "Game finished : Click here to access game history",
+      url: `${process.env.YU_SITE}/games/${game._id}`,
       fields: lb.map(b => ({ name: b.player.username, value: `${b.points}pts` })),
       timestamp: new Date(),
       footer: {
