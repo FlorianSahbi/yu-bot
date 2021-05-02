@@ -15,9 +15,6 @@ function someoneHasWin(game, score) {
       resolve(false);
     }
     if (score.length > 0) {
-      console.log(getMax(score))
-      console.log(game.goal)
-      console.log(score)
       if (getMax(score) > game.goal) {
         resolve(true);
       } else {

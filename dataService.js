@@ -2,17 +2,45 @@ const { request } = require('graphql-request');
 const { debuggerLog } = require("./utils/debuggerLog");
 const { TAGS } = require("./graphql/tags/tags");
 const { GAME } = require("./graphql/games/game");
+const { DELETE_GAME } = require("./graphql/games/deleteGame");
 const { RANDOM_TRACK } = require("./graphql/games/randomTrack");
 const { LEADERBOARD } = require("./graphql/games/leaderboard");
+const { CREATE_GUILD } = require("./graphql/guilds/createGuild");
+const { GUILD_BY_GUILD_ID } = require("./graphql/guilds/guildByGuildId");
 const { CREATE_GAME } = require("./graphql/games/createGame");
 const { UPDATE_AND_ADD } = require("./graphql/games/updateAndAdd");
 const { UPDATE_GAME_ADD_TAGS } = require("./graphql/games/updateGameAddTags");
 const { UPDATE_GAME_ADD_ROUND } = require("./graphql/games/updateGameAddRound");
 const { UPDATE_GAME_ADD_RANK } = require("./graphql/games/updateGameAddRank");
+const { PLAYLIST_TRACKS } = require("./graphql/games/playlistTracks");
+const { UPDATE_GUILD_IS_PLAYING } = require("./graphql/guilds/updateGuildIsPlaying");
 
 //////////////
 // REQUESTS //
 //////////////
+
+exports.createGuild = async ({
+  id,
+  name,
+  icon,
+  region,
+  memberCount,
+  premiumTier,
+  premiumSubscriptionCount,
+  joinedTimestamp,
+  maximumMembers,
+  preferredLocale,
+  ownerID }) => {
+  debuggerLog(new Date, "DS - dataService.createGuild", "Start");
+  const values = { id, name, icon, region, memberCount, premiumTier, premiumSubscriptionCount, joinedTimestamp, maximumMembers, preferredLocale, ownerID };
+  try {
+    const variables = { guildInput: { ...values } }
+    const { createGame } = await request(process.env.YU_API, CREATE_GUILD, variables);
+    return createGame;
+  } catch (error) {
+    debuggerLog(new Date, "Error - createGuild", error);
+  }
+}
 
 exports.createGame = async () => {
   debuggerLog(new Date, "DS - dataService.createGame", "Start");
@@ -69,7 +97,7 @@ exports.getGame = async (id) => {
 exports.addRound = (id, position, track) => {
   debuggerLog(new Date, "DS - dataService.addRound", "Start");
   try {
-    const variables = { id, roundInput: {position, track} };
+    const variables = { id, roundInput: { position, track } };
     return request(process.env.YU_API, UPDATE_GAME_ADD_ROUND, variables);
   } catch (error) {
     debuggerLog(new Date, "Error - addRound", error);
@@ -79,7 +107,7 @@ exports.addRound = (id, position, track) => {
 exports.addRank = (id, round, position, user, points) => {
   debuggerLog(new Date, "DS - dataService.addRank", "Start");
   try {
-    const variables = { id, round, rankInput: {position, user, points} };
+    const variables = { id, round, rankInput: { position, user, points } };
     return request(process.env.YU_API, UPDATE_GAME_ADD_RANK, variables);
   } catch (error) {
     debuggerLog(new Date, "Error - addRound", error);
@@ -103,5 +131,45 @@ exports.getRandomSongFromDb = (tag) => {
     return request(process.env.YU_API, RANDOM_TRACK, variables);
   } catch (error) {
     debuggerLog(new Date, "Error - getRandomSongFromDb", error);
+  }
+}
+
+exports.getPlaylistTracks = (tag) => {
+  debuggerLog(new Date, "DS - dataService.getPlaylistTracks", "Start");
+  try {
+    const variables = { tag };
+    return request(process.env.YU_API, PLAYLIST_TRACKS, variables);
+  } catch (error) {
+    debuggerLog(new Date, "Error - getPlaylistTracks", error);
+  }
+}
+
+exports.deleteGame = (id) => {
+  debuggerLog(new Date, "DS - dataService.deleteGame", "Start");
+  try {
+    const variables = { id };
+    return request(process.env.YU_API, DELETE_GAME, variables);
+  } catch (error) {
+    debuggerLog(new Date, "Error - deleteGame", error);
+  }
+}
+
+exports.getGuildByGuildId = (id) => {
+  debuggerLog(new Date, "DS - dataService.getGuildByGuildId", "Start");
+  try {
+    const variables = { id };
+    return request(process.env.YU_API, GUILD_BY_GUILD_ID, variables);
+  } catch (error) {
+    debuggerLog(new Date, "Error - getGuildByGuildId", error);
+  }
+}
+
+exports.updateGuildIsPlaying = (id, isPlaying) => {
+  debuggerLog(new Date, "DS - dataService.getGuildByGuildId", "Start");
+  try {
+    const variables = { id, isPlaying };
+    return request(process.env.YU_API, UPDATE_GUILD_IS_PLAYING, variables);
+  } catch (error) {
+    debuggerLog(new Date, "Error - getGuildByGuildId", error);
   }
 }

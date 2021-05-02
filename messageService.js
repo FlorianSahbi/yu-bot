@@ -1,4 +1,4 @@
-const {debuggerLog} = require("./utils/debuggerLog");
+const { debuggerLog } = require("./utils/debuggerLog");
 
 const color = "#ec4999";
 const author = {
@@ -6,6 +6,7 @@ const author = {
   icon_url: 'https://yu-client.vercel.app/yu.png',
   url: 'https://yu-client.vercel.app',
 };
+const footer = { text: "30s to make a choice" }
 
 //////////////
 // MESSAGES //
@@ -37,6 +38,7 @@ exports.sendJoinMessage = async (message) => {
       color,
       author,
       description: "A new game is about to start",
+      footer,
       fields: [
         {
           name: "Join",
@@ -66,6 +68,7 @@ exports.sendTagsMessage = async (message, tags) => {
     embed: {
       color,
       author,
+      footer,
       description: "Type `tag-name` to select it.",
       fields: [
         {
@@ -96,13 +99,13 @@ exports.sendValidationMessage = async (message, tag) => {
 }
 
 exports.sendRecapMessage = async (message, goal, time, tag, tagCover, players) => {
-  console.log({goal, time, tag, tagCover, players})
   debuggerLog(new Date, "MS - messageService.sendRecapMessage", "Start");
   const recapMessageEmbed = {
     embed: {
       author,
       color,
       description: "Game settings",
+      footer,
       fields: [
         {
           name: "Goal",
@@ -126,7 +129,7 @@ exports.sendRecapMessage = async (message, goal, time, tag, tagCover, players) =
         },
       ],
       image: {
-        url: tagCover? tagCover: "https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg",
+        url: tagCover ? tagCover : "https://helpx.adobe.com/content/dam/help/en/photoshop/using/convert-color-image-black-white/jcr_content/main-pars/before_and_after/image-before/Landscape-Color.jpg",
       }
     }
   };
