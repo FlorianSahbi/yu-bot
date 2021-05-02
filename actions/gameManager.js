@@ -1,6 +1,6 @@
 const { debuggerLog } = require("../utils/debuggerLog");
 const { playlistMod } = require("./playlistMod");
-const { createGame, getTags, getGame, createGuild } = require("../dataService");
+const { createGame, getTags, getGame, updateUserAddGame, updateUserAddGuild, updateUserAddTag } = require("../dataService");
 const { sendJoinMessage, sendTagsMessage, sendRecapMessage } = require("../messageService");
 const { attachMessageCollectorJoin, attachMessageCollectorTags, attachMessageCollectorRecap } = require("../collectors");
 const { joinVoiceChannel } = require("../utils");
@@ -9,11 +9,11 @@ const { joinVoiceChannel } = require("../utils");
 // MAIN //
 //////////
 
-exports.gameManager = async (message, nextStep = true, game = null) => {
+exports.gameManager = async (message, guild, nextStep = true, game = null) => {
   if (!message.member.voice.channel) {
     message.channel.send("I need you to be in a voice channel first!");
   }
-  
+
   const permissions = message.member.voice.channel.permissionsFor(message.client.user);
   if (!permissions.has("CONNECT") || !permissions.has("SPEAK")) {
     message.channel.send("I need the permissions to join and speak in your voice channel!");

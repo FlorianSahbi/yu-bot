@@ -41,7 +41,7 @@ client.on("message", async message => {
     if (guild?.isPlaying === false || guild?.isPlaying === undefined) {
       await createGuild(message.guild);
       const guild = await updateGuildIsPlaying(message.guild.id, true);
-      gameManager(message)
+      gameManager(message, guild)
     } else {
       message.channel.send("Your server is already in game, pls end it before")
     }
