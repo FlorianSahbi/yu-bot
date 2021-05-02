@@ -11,7 +11,7 @@ const { attachMessageCollectorSongPlaying, } = require("../collectors");
 const playTrack = async (message, game, connection, round, position, usersWithAnswer, score, queue) => {
   debuggerLog(new Date, "01 - PlaylistMod.playTrack", "Enter");
   const dispatcher = await connection
-    .play(await ytdl(queue[0].videoUrl, { begin: "31s", highWaterMark: 2000, bitrate: 96, volume: false, quality: "highestaudio" }), { type: 'opus' })
+    .play(await ytdl(queue[0].videoUrl, { begin: "31s", highWaterMark: 50, bitrate: 96, volume: false, quality: "highestaudio" }), { type: 'opus' })
     .on("start", async () => {
       debuggerLog(new Date, "01 - PlaylistMod.playTrack", "Start");
       const songPlayingMessage = await sendSongPlayingMessage(message, round, score);
