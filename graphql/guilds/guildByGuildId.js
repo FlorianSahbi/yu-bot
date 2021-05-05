@@ -7,6 +7,7 @@ exports.GUILD_BY_GUILD_ID = gql`
 query GuildByGuildId($id: ID) {
     guildByGuildId(id: $id) {
       isPlaying
+      _id
       id
       users {
         _id

@@ -2,7 +2,7 @@ const { Client } = require("discord.js");
 const { debuggerLog } = require("./utils/debuggerLog");
 const { gameManager } = require("./actions/gameManager");
 const { sendHelpMessage } = require("./messageService");
-const { getGuildByGuildId, updateGuildIsPlaying, createGuild } = require("./dataService");
+const { getGuildByGuildId, updateGuildIsPlaying, createGuild,  } = require("./dataService");
 const { sendErrorMessage } = require("./utils/bot/sendErrorMessage");
 const { joinVoiceChannel } = require("./utils");
 
@@ -36,6 +36,11 @@ client.on("message", async message => {
   else if (message.content.startsWith(`${config.prefix}j`)) {
     await joinVoiceChannel(message)
   }
+  else if (message.content.startsWith(`${config.prefix}forceEnd`)) {
+    const { guildByGuildId: guild } = await getGuildByGuildId(message.guild.id);
+    console.log(guild)
+    await updateGuildIsPlaying(guild.id, false);
+  }
   else if (message.content.startsWith(`${config.prefix}g`)) {
     const { guildByGuildId: guild } = await getGuildByGuildId(message.guild.id);
     if (guild?.isPlaying === false || guild?.isPlaying === undefined) {
@@ -43,7 +48,7 @@ client.on("message", async message => {
       const guild = await updateGuildIsPlaying(message.guild.id, true);
       gameManager(message, guild)
     } else {
-      message.channel.send("Your server is already in game, pls end it before")
+      message.channel.send("Your server is already in game, pls end it before or type !forceEnd if you think it's a mistake")
     }
     return;
   }

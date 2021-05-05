@@ -13,6 +13,7 @@ const { UPDATE_GAME_ADD_TAGS } = require("./graphql/games/updateGameAddTags");
 const { UPDATE_GAME_ADD_ROUND } = require("./graphql/games/updateGameAddRound");
 const { UPDATE_GAME_ADD_RANK } = require("./graphql/games/updateGameAddRank");
 const { PLAYLIST_TRACKS } = require("./graphql/games/playlistTracks");
+const { UPDATE_TRACK_IS_UNLISTED } = require("./graphql/tracks/updateTrackIsUnlisted");
 const { UPDATE_GUILD_IS_PLAYING } = require("./graphql/guilds/updateGuildIsPlaying");
 const { UPDATE_USER_ADD_GAME } = require("./graphql/users/updateUserAddGame");
 const { UPDATE_USER_ADD_TRACK } = require("./graphql/users/updateUserAddTrack");
@@ -219,5 +220,15 @@ exports.updateUserAddGuild = (id, guildId) => {
     return request(process.env.YU_API, UPDATE_USER_ADD_GUILD, variables);
   } catch (error) {
     debuggerLog(new Date, "Error - updateUserAddGuild", error);
+  }
+}
+
+exports.updateTrackIsUnlisted = (id, isUnlisted) => {
+  debuggerLog(new Date, "DS - dataService.updateTrackIsUnlisted", "Start");
+  try {
+    const variables = { id, isUnlisted };
+    return request(process.env.YU_API, UPDATE_TRACK_IS_UNLISTED, variables);
+  } catch (error) {
+    debuggerLog(new Date, "Error - updateTrackIsUnlisted", error);
   }
 }

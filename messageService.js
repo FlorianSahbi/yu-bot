@@ -79,6 +79,7 @@ exports.sendTagsMessage = async (message, tags) => {
     }
   }
   const tagsMessage = await message.channel.send(tagsMessageEmbed);
+  tagsMessage.react("🚫");
   return tagsMessage;
 }
 
@@ -147,6 +148,7 @@ exports.sendSongPlayingMessage = async (message, round, score) => {
       author,
       title: `Round : ${round} - Track is playing 🎶`,
       fields: score.map((s) => ({ name: s.player.username, value: `${s.points}pts` })),
+      footer: "As author, type `c` to force this game", 
     }
   };
   const songPlayingMessage = await message.channel.send(songPlayingMessageEmbed);

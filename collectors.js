@@ -70,25 +70,35 @@ exports.attachMessageCollectorTags = async (tagsMessage, message, game, tags) =>
   debuggerLog(new Date, "CC - collectors.attachMessageCollectorTags", "Start");
   return new Promise(async (resolve, reject) => {
     const filter = m => !m.author.bot && m.author.id === message.author.id;
-    const tagsMessagecollector = tagsMessage.channel.createMessageCollector(filter, { time: config.config.timeCollectors, errors: ['time'] });
+    const reactionFilter = (reaction, user) => (reaction.emoji.name === "🚫" && !user.bot && user.id === message.author.id);
+    const tagsMessagecollector = await tagsMessage.channel.createMessageCollector(filter, { time: config.config.timeCollectors, errors: ['time'] });
+    const tagsReactionCollector = await tagsMessage.createReactionCollector(reactionFilter, { time: config.config.timeCollectors, errors: ['time'] });
 
+    // If tag is valid
     tagsMessagecollector.on('collect', async (message) => {
       if (tags.map(({ name }) => name.trim().toLowerCase()).includes(message.content.trim().toLowerCase()) && !message.content.startsWith(`${config.config.prefix}`)) {
+        await tagsReactionCollector.stop();
         await tagsMessagecollector.stop();
       } else if (message.content.startsWith(`${config.config.prefix}`)) {
-        console.log("not good")
       } else {
         message.reply(`${message.content} does not exist`);
       }
     });
+
+    // If user asked to end current game
+    tagsReactionCollector.on('collect', async (reaction) => {
+      if (reaction.emoji.name === "🚫") {
+        await tagsReactionCollector.stop();
+        await tagsMessagecollector.stop();
+      }
+    })
 
     tagsMessagecollector.on('end', async (collected) => {
       if (collected.array().length > 0 && tags.map(({ name }) => name.trim().toLowerCase()).includes(collected.last().content.trim().toLowerCase())) {
         await updateGameWithTags(game._id, tags.filter(({ name }) => name.trim().toLowerCase() === collected.last().content.trim().toLowerCase()).map(({ _id }) => _id))
         resolve(true)
       } else {
-        await sendErrorMessage(message.channel, "Game canceled - Time exceeded")
-        await tagsMessagecollector.stop();
+        await sendErrorMessage(message.channel, "Game canceled")
         await deleteGame(game._id)
         await updateGuildIsPlaying(message.guild.id, false);
         await leaveVoiceChannel(message);
@@ -139,6 +149,9 @@ exports.attachMessageCollectorSongPlaying = async (round, songPlayingMessage, me
     const songPlayingMessageCollector = songPlayingMessage.channel.createMessageCollector(filter, { time: 30000 });
 
     songPlayingMessageCollector.on('collect', async (message) => {
+      if (message.content === "c") {
+        "end"
+      }
       if (song.answers.map((answer) => answer.trim().toLowerCase()).includes(message.content.trim().toLowerCase()) && !alreadyFindAnswer(message, usersWithAnswer)) {
         message.delete()
         message.reply(`got it`);

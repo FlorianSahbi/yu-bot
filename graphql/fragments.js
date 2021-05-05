@@ -11,6 +11,7 @@ exports.CORE_TRACK_FIELDS = gql`
     category
     ownerChannelName
     isAccepted
+    isUnlisted
     thumbnail
     answers
     keywords
