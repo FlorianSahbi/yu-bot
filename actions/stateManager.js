@@ -33,11 +33,13 @@ const playTrack = async (message, game, connection, song, round, position, users
   const dispatcher = await connection
     .play(await ytdl(song.videoUrl, { highWaterMark: 2000, bitrate: 96, volume: false, quality: "highestaudio" }), { type: 'opus' })
     .on("start", async () => {
+      console.log("OKOKOKOKOKOKOKO1")
       debuggerLog(new Date, "01 - stateManager.playTrack", "Start");
       const songPlayingMessage = await sendSongPlayingMessage(message, round, score);
       await attachMessageCollectorSongPlaying(round, songPlayingMessage, message, game, dispatcher, song, new Date(), position, usersWithAnswer)
     })
     .on("finish", async () => {
+      console.log("OKOKOKOKOKOKOKO2")
       debuggerLog(new Date, "01 - stateManager.playTrack", "Finish");
       await sendSongMessage(message, song.title, song.cover, song.url);
       stateManager(message, game, connection, round + 1, 1, usersWithAnswer = []);

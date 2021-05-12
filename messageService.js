@@ -148,7 +148,9 @@ exports.sendSongPlayingMessage = async (message, round, score) => {
       author,
       title: `Round : ${round} - Track is playing 🎶`,
       fields: score.map((s) => ({ name: s.player.username, value: `${s.points}pts` })),
-      footer: "As author, type `c` to force this game", 
+      footer: {
+        text: "As author, type `c` to properly end this game"
+      }, 
     }
   };
   const songPlayingMessage = await message.channel.send(songPlayingMessageEmbed);

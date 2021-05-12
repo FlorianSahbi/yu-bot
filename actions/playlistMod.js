@@ -10,6 +10,7 @@ const { attachMessageCollectorSongPlaying, } = require("../collectors");
 
 const playTrack = async (message, game, connection, round, position, usersWithAnswer, score, queue) => {
   debuggerLog(new Date, "01 - PlaylistMod.playTrack", "Enter");
+  let askStop = false;
   try {
     if (queue[0].isUnlisted) {
       debuggerLog(new Date, "01 - PlaylistMod.playTrack", "Track unlisted force next round");
@@ -22,12 +23,16 @@ const playTrack = async (message, game, connection, round, position, usersWithAn
       .on("start", async () => {
         debuggerLog(new Date, "01 - PlaylistMod.playTrack", "Start");
         const songPlayingMessage = await sendSongPlayingMessage(message, round, score);
-        await attachMessageCollectorSongPlaying(round, songPlayingMessage, message, game, dispatcher, queue[0], new Date(), position, usersWithAnswer)
+        console.log("m1")
+        const t = await attachMessageCollectorSongPlaying(round, songPlayingMessage, message, game, dispatcher, queue[0], new Date(), position, usersWithAnswer)
+        askStop = t;
+        console.log("m2")
       })
       .on("finish", async () => {
+        console.log("finish")
         debuggerLog(new Date, "01 - PlaylistMod.playTrack", "Finish");
         await sendSongMessage(message, queue[0].title, queue[0].thumbnail, queue[0].videoUrl);
-        playlistMod(message, game, connection, round + 1, 1, usersWithAnswer = [], queue);
+        playlistMod(message, game, connection, round + 1, 1, usersWithAnswer = [], queue, askStop);
       })
       .on("error", error => {
         debuggerLog(new Date, "MS - PlaylistMod.playTrack", error);
@@ -39,17 +44,17 @@ const playTrack = async (message, game, connection, round, position, usersWithAn
   }
 }
 
-const playlistMod = async (message, game, connection, round = 1, position = 1, usersWithAnswer = [], queue = []) => {
+const playlistMod = async (message, game, connection, round = 1, position = 1, usersWithAnswer = [], queue = [], askStop = false) => {
   queue.shift()
   debuggerLog(new Date, "01 - PlaylistMod.Init", "0");
   const { leaderboard: score } = await getLeaderbord(game._id);
   debuggerLog(new Date, "01 - PlaylistMod.someoneHasWin", "someoneHasWin Yes");
-  if (queue.length <= 0 && round === 1) {
+  if (queue.length <= 0 && round === 1 && !askStop) {
     const { playlistTracks: tracks } = await getPlaylistTracks(game.tags[0]._id); // Improve
     queue = tracks;
     await addRound(game._id, round, queue[0]._id);
     playTrack(message, game, connection, round, position, usersWithAnswer, score, queue);
-  } else if (queue.length > 0 && round >= 1) {
+  } else if (queue.length > 0 && round >= 1 && !askStop) {
     await addRound(game._id, round, queue[0]._id);
     playTrack(message, game, connection, round, position, usersWithAnswer, score, queue);
   } else {

@@ -150,7 +150,8 @@ exports.attachMessageCollectorSongPlaying = async (round, songPlayingMessage, me
 
     songPlayingMessageCollector.on('collect', async (message) => {
       if (message.content === "c") {
-        "end"
+        resolve(true)
+        songPlayingMessageCollector.stop();
       }
       if (song.answers.map((answer) => answer.trim().toLowerCase()).includes(message.content.trim().toLowerCase()) && !alreadyFindAnswer(message, usersWithAnswer)) {
         message.delete()
